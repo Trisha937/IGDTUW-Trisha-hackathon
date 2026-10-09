@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="6" fill="#047857"/>
+  <!-- Financial chart bars and trend in clean white and mint -->
+  <rect x="5" y="18" width="4" height="9" rx="1.5" fill="#A7F3D0"/>
+  <rect x="11" y="14" width="4" height="13" rx="1.5" fill="#6EE7B7"/>
+  <rect x="17" y="10" width="4" height="17" rx="1.5" fill="#34D399"/>
+  <rect x="23" y="6" width="4" height="21" rx="1.5" fill="#FFFFFF"/>
+  <path d="M5 16 L12 11 L18 12 L26 5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="26" cy="5" r="2.2" fill="#F59E0B"/>
+</svg>

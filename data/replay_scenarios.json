@@ -1,0 +1,83 @@
+{
+  "scenario_tech_surge": {
+    "name": "Scenario A: Tech Outperformance & Generative AI Contract Boom",
+    "description": "Infosys secures a $1.5B global enterprise contract and TCS beats Q3 estimates with $9.2B total deal wins, triggering a bullish shift towards IT services.",
+    "items": [
+      {
+        "title": "Infosys Secures Landmark $1.5 Billion Generative AI Expansion Contract with Global Tier-1 Bank",
+        "text": "Infosys today announced an expanded strategic collaboration valued at over $1.5 billion over five years to provide generative AI-driven engineering and enterprise cloud modernization for a leading European financial institution. The agreement is expected to significantly boost operating margins and market share.",
+        "source": "news",
+        "author": "Economic Times Bureau",
+        "target_ticker": "INFY"
+      },
+      {
+        "title": "Tata Consultancy Services (TCS) Reports 8.4% YoY Q3 Profit Growth, Beats Street Estimates",
+        "text": "TCS delivered strong third-quarter results, driven by strong deal bookings worth $9.2 billion. Management highlighted accelerating discretionary IT spending and resilience in North American banking client accounts, declaring an interim dividend of Rs 28 per share.",
+        "source": "news",
+        "author": "Mint Markets",
+        "target_ticker": "TCS"
+      },
+      {
+        "title": "Huge institutional accumulation in Indian IT giants $INFY and $TCS",
+        "text": "Massive call buying in $INFY and $TCS today. Tech index poised for a strong multi-month breakout as AI deal momentum offsets US macro worries. Upweighting tech! #NiftyIT #DalalStreet",
+        "source": "social",
+        "author": "@QuantDesk_BOM (Twitter/X)",
+        "target_ticker": "INFY"
+      }
+    ]
+  },
+  "scenario_banking_stress": {
+    "name": "Scenario B: Banking Sector Regulatory Action & Asset Quality Headwinds",
+    "description": "RBI imposes digital compliance penalties and warnings on major lenders, causing risk-off rebalancing away from banking into defensive assets.",
+    "items": [
+      {
+        "title": "RBI Imposes Rs 2.5 Crore Penalty on HDFC Bank Over Digital Compliance Lapses",
+        "text": "The Reserve Bank of India has issued an administrative penalty of Rs 2.5 crore on HDFC Bank for non-compliance with certain regulatory directions regarding digital banking infrastructure resiliency and reporting standards. Analysts note this may raise short-term compliance costs and draw regulatory scrutiny.",
+        "source": "news",
+        "author": "Reuters Finance",
+        "target_ticker": "HDFCBANK"
+      },
+      {
+        "title": "Concerns over HDFC Bank net interest margins and digital audit findings",
+        "text": "RBI fine on $HDFCBANK raises questions about legacy IT integration after merger. Margin recovery delayed. Banking index looking heavy today. #NiftyBank #HDFC",
+        "source": "social",
+        "author": "@FinWizard_IN (Twitter/X)",
+        "target_ticker": "HDFCBANK"
+      },
+      {
+        "title": "State Bank of India (SBIN) Approves Raising Rs 10,000 Crore via Infrastructure Bonds",
+        "text": "The executive committee of the State Bank of India central board has approved raising up to Rs 10,000 crore through long-term infrastructure bonds to fund affordable housing and public infrastructure credit pipelines at competitive coupon yields.",
+        "source": "news",
+        "author": "Business Standard",
+        "target_ticker": "SBIN"
+      }
+    ]
+  },
+  "scenario_macro_mixed": {
+    "name": "Scenario C: Mixed Macro Shift - Infrastructure Capex & Telecom Overhang",
+    "description": "L&T wins bullet train contracts and Reliance commissions clean energy gigafactory, while Bharti Airtel receives unexpected AGR tax demand notices.",
+    "items": [
+      {
+        "title": "Larsen & Toubro Wins Major Rs 7,500 Crore High-Speed Rail Infrastructure Contract",
+        "text": "L&T Heavy Civil Infrastructure business has secured a mega EPC contract from the National High Speed Rail Corporation for constructing viaducts and stations. This win expands L&T's consolidated order book beyond Rs 4.5 lakh crore.",
+        "source": "news",
+        "author": "ET Infrastructure",
+        "target_ticker": "LT"
+      },
+      {
+        "title": "Reliance Industries Announces Mega 20 GW Solar Gigafactory Commissioning in Gujarat",
+        "text": "Reliance Industries Ltd (RIL) chairman announced the early commissioning of its fully integrated 20 GW solar photovoltaic giga-complex in Jamnagar. Brokerages including Morgan Stanley and Goldman Sachs upgraded target prices, citing high future cash flow visibility in new energy.",
+        "source": "news",
+        "author": "Bloomberg Markets",
+        "target_ticker": "RELIANCE"
+      },
+      {
+        "title": "Bharti Airtel Faces Stiff Department of Telecom Notice on Adjusted Gross Revenue Dues",
+        "text": "The Department of Telecommunications (DoT) has issued a fresh demand notice regarding recalculation of AGR dues totaling approximately Rs 3,400 crore against telecom operators including Bharti Airtel. Legal teams are preparing an immediate curative petition before the Supreme Court.",
+        "source": "news",
+        "author": "CNBC-TV18",
+        "target_ticker": "BHARTIARTL"
+      }
+    ]
+  }
+}

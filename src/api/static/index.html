@@ -1,0 +1,2953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S&P Global & CRISIL | Tactical Stock Index Rebalancer</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* High-Contrast Institutional Palette - Forest Slate, Sage Mist & Crisp Cards */
+      --bg-page: #EEF3F0;            /* Calm Sage/Slate Mist background (no blinding white) */
+      --bg-card: #FFFFFF;            /* Elevated pure white cards */
+      --bg-shaded: #E2EAE5;          /* Distinct shaded panels & container wells */
+      --bg-header: #082119;          /* Deep Forest Slate header bar */
+      --bg-row-alt: #F7FAF8;         /* Subtle alternating row tint */
+      
+      --border-strong: #CBD5E1;      /* Crisp defining borders */
+      --border-subtle: #E2E8F0;      /* Soft interior dividers */
+      
+      --text-dark: #0F172A;          /* High-contrast deep slate text */
+      --text-body: #334155;          /* Crisp readable body copy */
+      --text-muted: #64748B;         /* Secondary descriptive labels */
+      
+      --emerald-600: #059669;        /* Vibrant Emerald */
+      --emerald-700: #047857;        /* Deep Forest Green */
+      --emerald-badge-bg: #D1FAE5;   /* High-contrast green badge fill */
+      --emerald-badge-text: #065F46; /* High-contrast green badge text */
+      
+      --red-600: #DC2626;
+      --red-badge-bg: #FEE2E2;
+      --red-badge-text: #991B1B;
+      
+      --amber-600: #D97706;
+      --amber-badge-bg: #FEF3C7;
+      --amber-badge-text: #92400E;
+      
+      --blue-600: #2563EB;
+      --blue-badge-bg: #DBEAFE;
+      --blue-badge-text: #1E40AF;
+
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-card: 0 2px 6px -1px rgba(0, 0, 0, 0.07), 0 1px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 6px 12px -2px rgba(0, 0, 0, 0.09), 0 3px 6px -3px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.12), 0 6px 12px -6px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-body);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Anchoring Forest Slate Header */
+    header {
+      background-color: var(--bg-header);
+      border-bottom: 2px solid #0F3A2E;
+      padding: 16px 36px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+      max-width: 1560px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      background: #10B981;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: #06241C;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-badge {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #6EE7B7;
+      border: 1px solid rgba(110, 231, 183, 0.35);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-sub {
+      font-size: 13.5px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    /* Institutional Header Navigation */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #CBD5E1;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-btn.active {
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(52, 211, 153, 0.4);
+      font-weight: 700;
+    }
+
+    .btn-launch-terminal {
+      background: #059669;
+      color: #FFFFFF;
+      border: 1px solid #10B981;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      transition: all 0.18s ease;
+    }
+
+    .btn-launch-terminal:hover {
+      background: #047857;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pill-status {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .dot-live {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: #34D399;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.35);
+    }
+
+    /* Views Framework */
+    .view-panel {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      gap: 32px;
+      animation: fadeInView 0.25s ease forwards;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================================================
+       LANDING PAGE ARCHITECTURE & SECTIONS
+       ========================================================================= */
+    .landing-hero {
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-top: 5px solid var(--emerald-600);
+      border-radius: 12px;
+      padding: 38px 44px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .landing-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--emerald-badge-bg);
+      color: var(--emerald-badge-text);
+      border: 1px solid #A7F3D0;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      align-self: flex-start;
+    }
+
+    .landing-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+      letter-spacing: -0.6px;
+    }
+
+    .landing-subtitle {
+      font-size: 16.5px;
+      color: var(--text-body);
+      max-width: 1100px;
+      line-height: 1.65;
+    }
+
+    .landing-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .btn-lg {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-strong);
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+    .btn-outline:hover {
+      background: var(--bg-shaded);
+      border-color: #94A3B8;
+    }
+
+    /* Live Nifty 10 Ticker Stream Strip on Landing Page */
+    .landing-ticker-strip {
+      background: #082119;
+      border: 1px solid #0F3A2E;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ticker-strip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: #6EE7B7;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ticker-strip-items {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 1100px) {
+      .ticker-strip-items {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .ticker-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .ticker-chip:hover {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: #10B981;
+    }
+
+    .chip-sym {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: #FFFFFF;
+      font-size: 13px;
+    }
+
+    .chip-sec {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+
+    .chip-wt {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #34D399;
+    }
+
+    /* Live Specification Strip */
+    .landing-specs {
+      background: #F1F5F9;
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      border: 1px solid var(--border-strong);
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+
+    .spec-label {
+      color: #065F46;
+      font-weight: 800;
+    }
+
+    .spec-val {
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .spec-divider {
+      width: 1px;
+      height: 16px;
+      background: #CBD5E1;
+    }
+
+    @media (max-width: 900px) {
+      .spec-divider {
+        display: none;
+      }
+    }
+
+    /* Landing Deep-Dive Sections */
+    .landing-section {
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 34px 40px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .section-head {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--emerald-600);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--text-body);
+      max-width: 980px;
+      line-height: 1.6;
+    }
+
+    /* Problem vs. Solution 2-Column Grid */
+    .problem-solution-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .problem-solution-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ps-card {
+      border-radius: 8px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ps-problem {
+      background: #FFF1F2;
+      border: 1px solid #FECDD3;
+      border-left: 5px solid var(--red-600);
+    }
+
+    .ps-solution {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-left: 5px solid var(--emerald-600);
+    }
+
+    .ps-title {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ps-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+
+    .ps-bullets li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .ps-bullets li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .ps-solution .ps-bullets li::before {
+      color: var(--emerald-600);
+    }
+
+    .ps-problem .ps-bullets li::before {
+      color: var(--red-600);
+    }
+
+    /* Pillars Grid */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    @media (max-width: 960px) {
+      .pillars-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pillar-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .pillar-box:hover {
+      border-color: var(--emerald-600);
+      background: #F0FDF4;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--emerald-600);
+    }
+
+    .pillar-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .pillar-text {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.55;
+    }
+
+    /* Constituents Universe Grid */
+    .constituents-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .constituents-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .constituent-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .constituent-card:hover {
+      border-color: var(--emerald-600);
+      background: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+
+    .const-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .const-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-top: 4px;
+    }
+
+    .const-sec {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .const-weight-bar {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+    }
+
+    /* Rulebook Cards Grid */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 960px) {
+      .rules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .rule-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border-strong);
+      border-top: 4px solid var(--emerald-600);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rule-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--emerald-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .rule-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .rule-formula {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #065F46;
+      background: var(--emerald-badge-bg);
+      border: 1px solid #A7F3D0;
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin: 4px 0;
+    }
+
+    .rule-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Landing CTA Banner */
+    .landing-cta-banner {
+      background: #082119;
+      border: 1px solid #0F3A2E;
+      border-radius: 12px;
+      padding: 36px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .cta-text h3 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .cta-text p {
+      font-size: 15px;
+      color: #94A3B8;
+      max-width: 680px;
+    }
+
+    /* Terminal View Header Bar */
+    .terminal-topbar {
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .terminal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back-overview {
+      background: #F1F5F9;
+      border: 1px solid var(--border-strong);
+      color: var(--text-dark);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-back-overview:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+    }
+
+    .terminal-view-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    /* Main Container */
+    .app-container {
+      max-width: 1560px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex: 1;
+    }
+
+    /* KPI Summary Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Institutional Floating Interactive Tooltip Portal */
+    .institutional-tooltip {
+      position: fixed;
+      z-index: 100000;
+      background: #082119;
+      color: #FFFFFF;
+      border: 1px solid #1E3A2F;
+      border-left: 4px solid #10B981;
+      border-radius: 8px;
+      padding: 10px 14px;
+      max-width: 330px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.25);
+      font-family: var(--font-sans);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease;
+    }
+
+    .institutional-tooltip.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .tt-header {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #34D399;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tt-body {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #F1F5F9;
+      font-weight: 450;
+    }
+
+    .tt-formula {
+      margin-top: 6px;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #6EE7B7;
+    }
+
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #CBD5E1;
+      color: #0F172A;
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      margin-left: 6px;
+      cursor: help;
+      vertical-align: middle;
+      line-height: 1;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+    .info-icon:hover {
+      background: #059669;
+      color: #FFFFFF;
+      transform: scale(1.15);
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-top: 4px solid var(--emerald-600);
+      border-radius: 10px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .kpi-card:nth-child(2) {
+      border-top-color: var(--blue-600);
+    }
+
+    .kpi-card:nth-child(3) {
+      border-top-color: var(--amber-600);
+    }
+
+    .kpi-card:nth-child(4) {
+      border-top-color: #047857;
+    }
+
+    .kpi-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .kpi-title {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 29px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-top: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    /* Scenario Replay Control Center */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 18px 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .scenario-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .controls-label {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dark);
+      margin-right: 4px;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: #FFFFFF;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-shaded);
+      border-color: #94A3B8;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-scenario {
+      border-left: 4.5px solid var(--emerald-600);
+    }
+
+    .btn-scenario-a {
+      border-left-color: var(--emerald-600);
+      background: #F0FDF4;
+    }
+
+    .btn-scenario-b {
+      border-left-color: var(--red-600);
+      background: #FEF2F2;
+    }
+
+    .btn-scenario-c {
+      border-left-color: var(--amber-600);
+      background: #FFFBEB;
+    }
+
+    .btn-primary {
+      background: var(--emerald-700);
+      color: #FFFFFF;
+      border-color: var(--emerald-700);
+      box-shadow: 0 2px 4px rgba(4, 120, 87, 0.25);
+    }
+    .btn-primary:hover {
+      background: #065F46;
+      border-color: #065F46;
+    }
+
+    .btn-outline-danger {
+      color: var(--text-muted);
+      border-color: var(--border-strong);
+    }
+    .btn-outline-danger:hover {
+      color: var(--red-600);
+      background: #FEE2E2;
+      border-color: #F87171;
+    }
+
+    /* Dashboard Split Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.16fr 0.84fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1180px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 2px solid var(--border-strong);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F1F6F3; /* Crisp shaded header for distinct visual hierarchy */
+      gap: 12px;
+    }
+
+    .card-heading {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.2px;
+    }
+
+    .card-description {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .tag-limits {
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Portfolio Table */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 13px 20px;
+      background: #E2EAE5; /* Shaded table header for high contrast */
+      color: #1E293B;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 2px solid var(--border-strong);
+      font-family: var(--font-mono);
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 14.5px;
+      vertical-align: middle;
+    }
+
+    tr:nth-child(even) td {
+      background-color: var(--bg-row-alt); /* Subtle alternating zebra rows */
+    }
+
+    tr:hover td {
+      background-color: #EBF3EE;
+    }
+
+    /* High-Contrast Ticker Badges */
+    .badge-ticker {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 13.5px;
+      color: #FFFFFF;
+      background: #0F172A; /* Deep dark badge makes tickers pop */
+      padding: 3px 9px;
+      border-radius: 5px;
+      display: inline-block;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    .comp-name {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 14.5px;
+    }
+
+    .comp-sector {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 1px;
+      font-weight: 500;
+    }
+
+    .weight-text {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .badge-delta {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .badge-pos {
+      background: var(--emerald-badge-bg);
+      color: var(--emerald-badge-text);
+      border: 1px solid #A7F3D0;
+    }
+
+    .badge-neg {
+      background: var(--red-badge-bg);
+      color: var(--red-badge-text);
+      border: 1px solid #FECACA;
+    }
+
+    .badge-zero {
+      background: #E2E8F0;
+      color: #475569;
+      border: 1px solid #CBD5E1;
+    }
+
+    /* High-Contrast Allocation Progress Bar */
+    .bar-track {
+      position: relative;
+      background: #CBD5E1; /* Darker track for clear contrast */
+      height: 11px;
+      border-radius: 4px;
+      width: 150px;
+      overflow: hidden;
+      border: 1px solid #94A3B8;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--emerald-600);
+      border-radius: 3px;
+      transition: width 0.35s ease, background-color 0.35s ease;
+    }
+
+    .bar-fill.tilted-down {
+      background: var(--red-600);
+    }
+
+    .bar-notch {
+      position: absolute;
+      left: 50%; /* 10% benchmark */
+      top: 0;
+      bottom: 0;
+      width: 2.5px;
+      background: #0F172A;
+      opacity: 0.65;
+      z-index: 2;
+    }
+
+    /* Risk Signals Feed - High-Contrast Shaded Well */
+    .feed-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 680px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #E8EFEA; /* Distinct shaded well background */
+    }
+
+    .signal-item {
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-left: 5px solid var(--emerald-600);
+      border-radius: 8px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .signal-item.item-announcement {
+      border-left-color: var(--blue-600);
+    }
+
+    .signal-item.item-social {
+      border-left-color: var(--amber-600);
+    }
+
+    .signal-item:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .item-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag-src {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .src-announcement {
+      background: var(--blue-badge-bg);
+      color: var(--blue-badge-text);
+      border: 1px solid #93C5FD;
+    }
+
+    .src-news {
+      background: var(--emerald-badge-bg);
+      color: var(--emerald-badge-text);
+      border: 1px solid #A7F3D0;
+    }
+
+    .src-social {
+      background: var(--amber-badge-bg);
+      color: var(--amber-badge-text);
+      border: 1px solid #FDE68A;
+    }
+
+    .tag-event {
+      font-size: 12px;
+      color: #1E293B;
+      background: #E2EAE5;
+      border: 1px solid #CBD5E1;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .item-metrics {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chip-impact {
+      color: var(--amber-badge-text);
+      background: var(--amber-badge-bg);
+      border: 1px solid #FCD34D;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .item-reason {
+      font-size: 14px;
+      color: var(--text-dark);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .btn-evidence {
+      font-size: 12.5px;
+      color: var(--emerald-700);
+      background: none;
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
+      font-family: var(--font-mono);
+      text-decoration: underline;
+      font-weight: 700;
+      padding: 0;
+    }
+
+    .box-evidence {
+      background: #F1F6F3;
+      border: 1px solid var(--border-strong);
+      padding: 12px 14px;
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      color: var(--text-dark);
+      border-radius: 6px;
+      display: none;
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 33, 25, 0.6);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border: 2px solid var(--border-strong);
+      border-radius: 12px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 2px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F1F6F3;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-body);
+    }
+
+    .modal-body h4 {
+      color: var(--text-dark);
+      margin: 16px 0 6px 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .modal-body p, .modal-body ul {
+      margin-bottom: 12px;
+    }
+
+    .modal-body ul {
+      padding-left: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text-dark);
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--emerald-600);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--bg-header);
+      border-top: 1px solid #0F3A2E;
+      padding: 20px 36px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1560px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a, .footer-links button {
+      color: #CBD5E1;
+      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .footer-links a:hover, .footer-links button:hover {
+      color: #6EE7B7;
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #64748B;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Institutional Floating Interactive Tooltip Portal -->
+  <div id="global-tooltip" class="institutional-tooltip" role="tooltip" aria-hidden="true">
+    <div class="tt-header" id="tt-header"></div>
+    <div class="tt-body" id="tt-body"></div>
+    <div class="tt-formula" id="tt-formula" style="display: none;"></div>
+  </div>
+
+  <!-- Top Anchoring Forest Slate Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-group">
+        <div class="brand-mark">S&amp;P</div>
+        <div class="brand-text">
+          <h1>
+            S&amp;P Global &amp; CRISIL Tactical Stock Index Rebalancer
+            <span class="brand-badge" data-tooltip="Tactical Stock Index Rebalancer for Nifty 10 (S&amp;P Global &amp; CRISIL Campus Hackathon Phase 3: Module A)." data-tooltip-title="Module A: Tactical Rebalancer">MODULE A</span>
+          </h1>
+          <div class="brand-sub">Nifty 10 Constituent Benchmark &bull; Real-Time Unstructured Risk Signals &amp; Dynamic Tilting</div>
+        </div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <nav class="header-nav">
+        <button class="nav-btn active" id="nav-btn-landing" onclick="switchView('landing')">
+          Overview
+        </button>
+        <button class="nav-btn" onclick="scrollToLandingSection('sec-problem')">
+          The Problem
+        </button>
+        <button class="nav-btn" onclick="scrollToLandingSection('sec-how-it-works')">
+          How It Works
+        </button>
+        <button class="nav-btn" onclick="scrollToLandingSection('sec-constituents')">
+          Nifty 10 Basket
+        </button>
+        <button class="nav-btn" onclick="scrollToLandingSection('sec-rulebook')">
+          Rulebook
+        </button>
+        <button class="nav-btn" onclick="openArchitectureModal()">
+          Architecture
+        </button>
+        <button class="nav-btn" onclick="openMethodologyModal()">
+          Methodology
+        </button>
+      </nav>
+
+      <!-- Terminal CTA & Status -->
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="btn-launch-terminal" id="nav-btn-terminal" onclick="switchView('terminal')">
+          <span class="dot-live"></span>
+          <span>Live Rebalance Terminal &rarr;</span>
+        </button>
+
+        <div class="header-status">
+          <div class="pill-status" data-tooltip="Sequential rebalancing iteration counter." data-tooltip-title="Rebalancing Cycle">
+            <span>CYCLE: #<span id="header-cycle">0</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <!-- =====================================================================
+         VIEW 1: DEDICATED INSTITUTIONAL LANDING PAGE
+         ===================================================================== -->
+    <div id="view-landing" class="view-panel active">
+
+      <!-- Hero Section -->
+      <section class="landing-hero">
+        <div class="landing-badge">
+          <span>S&amp;P GLOBAL &amp; CRISIL CAMPUS HACKATHON 2026 &bull; PHASE 3 CASE STUDY (MODULE A)</span>
+        </div>
+        <h2 class="landing-title">
+          Continuous AI Financial Risk Engine &amp; Tactical Stock Index Rebalancer
+        </h2>
+        <p class="landing-subtitle">
+          An institutional intelligence system that transforms high-frequency, unstructured news feeds and exchange filings
+          into auditable risk signals—automatically rebalancing a <strong>Nifty 10 Blue-Chip Index</strong> under strict portfolio constraints.
+        </p>
+
+        <div class="landing-actions">
+          <button class="btn btn-primary btn-lg" onclick="switchView('terminal')" data-tooltip="Launch the live rebalancer terminal with interactive scenario replays and real-time simplex optimization." data-tooltip-title="Launch Terminal">
+            Launch Live Rebalance Terminal &rarr;
+          </button>
+          <button class="btn btn-outline" onclick="openArchitectureModal()" data-tooltip="Inspect the complete end-to-end system architecture diagram and pipeline data flow." data-tooltip-title="System Architecture">
+            View Architecture Diagram
+          </button>
+          <button class="btn btn-outline" onclick="openMethodologyModal()" data-tooltip="Review formal mathematical proofs, exponential tilting equations, and water-filling bounded simplex algorithm." data-tooltip-title="Quantitative Proofs">
+            Mathematical Proof &amp; Bounds
+          </button>
+        </div>
+
+        <!-- Live Nifty 10 Ticker Stream Strip -->
+        <div class="landing-ticker-strip">
+          <div class="ticker-strip-header">
+            <span>Live Nifty 10 Constituent Benchmark &bull; Base Allocation: 10.00% Each</span>
+            <span style="color: #94A3B8;">Real-Time Monitored Securities</span>
+          </div>
+          <div class="ticker-strip-items" id="landing-ticker-items">
+            <!-- Dynamically populated or static fallbacks -->
+            <div class="ticker-chip">
+              <div><span class="chip-sym">RELIANCE</span><div class="chip-sec">Energy</div></div>
+              <span class="chip-wt" id="lt-wt-RELIANCE">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">TCS</span><div class="chip-sec">IT Services</div></div>
+              <span class="chip-wt" id="lt-wt-TCS">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">INFY</span><div class="chip-sec">IT Services</div></div>
+              <span class="chip-wt" id="lt-wt-INFY">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">HDFCBANK</span><div class="chip-sec">Banking</div></div>
+              <span class="chip-wt" id="lt-wt-HDFCBANK">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">ICICIBANK</span><div class="chip-sec">Banking</div></div>
+              <span class="chip-wt" id="lt-wt-ICICIBANK">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">SBIN</span><div class="chip-sec">Banking</div></div>
+              <span class="chip-wt" id="lt-wt-SBIN">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">BHARTIARTL</span><div class="chip-sec">Telecom</div></div>
+              <span class="chip-wt" id="lt-wt-BHARTIARTL">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">ITC</span><div class="chip-sec">FMCG</div></div>
+              <span class="chip-wt" id="lt-wt-ITC">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">LT</span><div class="chip-sec">Engineering</div></div>
+              <span class="chip-wt" id="lt-wt-LT">10.00%</span>
+            </div>
+            <div class="ticker-chip">
+              <div><span class="chip-sym">HINDUNILVR</span><div class="chip-sec">FMCG</div></div>
+              <span class="chip-wt" id="lt-wt-HINDUNILVR">10.00%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Specification Bar -->
+        <div class="landing-specs">
+          <div class="spec-item" data-tooltip="Equal-weight baseline (10.00% per stock) across 10 representative Indian blue-chips." data-tooltip-title="Index Universe" data-tooltip-formula="RELIANCE, TCS, INFY, HDFCBANK, ICICIBANK, SBIN, BHARTIARTL, ITC, LT, HINDUNILVR">
+            <span class="spec-label">BENCHMARK:</span>
+            <span class="spec-val">Nifty 10 (10% Equal-Weight Base)</span>
+          </div>
+          <div class="spec-divider"></div>
+          <div class="spec-item" data-tooltip="Iterative water-filling algorithm strictly guaranteeing exact 100% simplex sum under asymmetric box bounds." data-tooltip-title="Simplex Projection Optimizer" data-tooltip-formula="min 0.5||w - w_tilt||² s.t. 0.05 ≤ w_i ≤ 0.20, Σw_i = 1">
+            <span class="spec-label">OPTIMIZER:</span>
+            <span class="spec-val">Bounded Simplex Projection</span>
+          </div>
+          <div class="spec-divider"></div>
+          <div class="spec-item" data-tooltip="Volatility control: no stock weight can move by more than ±2.0% in a single cycle to eliminate whipsawing." data-tooltip-title="Cycle Movement Limiter" data-tooltip-formula="|w_i(t) - w_i(t-1)| ≤ 0.0200">
+            <span class="spec-label">STEP CAP:</span>
+            <span class="spec-val">&plusmn;2.0% Delta per Constituent</span>
+          </div>
+          <div class="spec-divider"></div>
+          <div class="spec-item" data-tooltip="Hard regulatory constraints: 5.0% floor prevents constituent liquidation, 20.0% cap prevents excessive single-stock concentration." data-tooltip-title="Portfolio Safety Rails" data-tooltip-formula="0.05 ≤ w_i ≤ 0.20">
+            <span class="spec-label">SAFETY:</span>
+            <span class="spec-val">5.0% Floor &bull; 20.0% Concentration Cap</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Problem vs. Solution -->
+      <section class="landing-section" id="sec-problem">
+        <div class="section-head">
+          <div class="section-eyebrow">MARKET SURVEILLANCE &amp; REBALANCING PARADIGM</div>
+          <h3 class="section-title">The Industry Bottleneck vs. Dynamic Tilting</h3>
+          <p class="section-desc">
+            Traditional quantitative indices suffer from rigid reconstitution schedules, leaving portfolios vulnerable to unforeseen corporate events and regulatory shocks.
+          </p>
+        </div>
+
+        <div class="problem-solution-grid">
+          <div class="ps-card ps-problem">
+            <div class="ps-title">
+              <span style="color: var(--red-600); font-size: 18px;">&times;</span>
+              Traditional Quarterly Rebalancing Bottlenecks
+            </div>
+            <ul class="ps-bullets">
+              <li><strong>Information Lag:</strong> Material events (e.g. RBI fines, CEO departures) take weeks or months to reflect in quarterly rebalancing schedules.</li>
+              <li><strong>Drawdown Exposure:</strong> Funds hold full benchmark weights in distressed securities while news breaks across unstructured channels.</li>
+              <li><strong>Noise vs. Substance:</strong> Manual analysts are flooded with thousands of noisy headlines per day, resulting in analysis paralysis.</li>
+            </ul>
+          </div>
+
+          <div class="ps-card ps-solution">
+            <div class="ps-title">
+              <span style="color: var(--emerald-600); font-size: 18px;">&check;</span>
+              Our Automated AI/NLP Dynamic Rebalancer
+            </div>
+            <ul class="ps-bullets">
+              <li><strong>Continuous Signal Ingestion:</strong> Real-time surveillance of Economic Times RSS, NSE corporate filings, and social chatter.</li>
+              <li><strong>7-Day Decaying Vector Memory:</strong> Retains past context with exponential decay (e<sup>&minus;&lambda;&Delta;t</sup>) so one-off rumors fade smoothly.</li>
+              <li><strong>Strict Bounded Simplex:</strong> Tilts weights away from risk and toward catalysts while capping turnover at &le;10% and movement at &plusmn;2%.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: How It Works (The 3 Pillars) -->
+      <section class="landing-section" id="sec-how-it-works">
+        <div class="section-head">
+          <div class="section-eyebrow">SYSTEM ARCHITECTURE &amp; EXECUTION PIPELINE</div>
+          <h3 class="section-title">End-to-End Quantitative Risk Architecture</h3>
+          <p class="section-desc">
+            The platform connects data ingestion, neural language models, and convex portfolio optimization into a single unified execution loop.
+          </p>
+        </div>
+
+        <div class="pillars-grid">
+          <div class="pillar-box">
+            <div class="pillar-num">PILLAR 01</div>
+            <div class="pillar-title">Multi-Source Stream Ingestion</div>
+            <div class="pillar-text">
+              Continuously collects Economic Times RSS feeds, NSE corporate disclosures, and Reddit chatter. Uses SHA-256 fingerprinting for deduplication and assigns source credibility weights (Announcements 1.0 &gt; News 0.8 &gt; Social 0.3).
+            </div>
+          </div>
+
+          <div class="pillar-box">
+            <div class="pillar-num">PILLAR 02</div>
+            <div class="pillar-title">AI/NLP Risk Engine &amp; 7-Day Memory</div>
+            <div class="pillar-text">
+              Resolves entities against the Nifty 10 universe, generates continuous sentiment scores [-1.00 to +1.00], classifies events into an 8-class financial taxonomy, and scores severity on a 1&ndash;10 institutional rubric.
+            </div>
+          </div>
+
+          <div class="pillar-box">
+            <div class="pillar-num">PILLAR 03</div>
+            <div class="pillar-title">Constrained Index Rebalancer</div>
+            <div class="pillar-text">
+              Applies exponential tilting w&#771;&#7522; &prop; 0.10 &times; exp(0.5 &times; S&#7522;) solved via water-filling simplex projection strictly enforcing 5%&ndash;20% bounds, 10% maximum cycle turnover, and &plusmn;2.0% step dampeners.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Nifty 10 Basket -->
+      <section class="landing-section" id="sec-constituents">
+        <div class="section-head">
+          <div class="section-eyebrow">PORTFOLIO UNIVERSE</div>
+          <h3 class="section-title">Representative Nifty 10 Constituent Universe</h3>
+          <p class="section-desc">
+            A balanced 10-stock blue-chip basket spanning Banking, IT Services, Energy, Telecom, FMCG, and Infrastructure. Neutral benchmark base allocation is equal-weighted at 10.00% each.
+          </p>
+        </div>
+
+        <div class="constituents-grid">
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">RELIANCE</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Reliance Industries</div>
+            <div class="const-sec">Energy &bull; Oil &amp; Gas</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-RELIANCE">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">TCS</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Tata Consultancy Services</div>
+            <div class="const-sec">IT Services &bull; Enterprise Software</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-TCS">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">INFY</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Infosys Limited</div>
+            <div class="const-sec">IT Services &bull; Cloud &amp; AI</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-INFY">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">HDFCBANK</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">HDFC Bank</div>
+            <div class="const-sec">Financials &bull; Private Banking</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-HDFCBANK">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">ICICIBANK</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">ICICI Bank</div>
+            <div class="const-sec">Financials &bull; Private Banking</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-ICICIBANK">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">SBIN</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">State Bank of India</div>
+            <div class="const-sec">Financials &bull; Public Banking</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-SBIN">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">BHARTIARTL</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Bharti Airtel</div>
+            <div class="const-sec">Telecommunications &bull; 5G</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-BHARTIARTL">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">ITC</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">ITC Limited</div>
+            <div class="const-sec">Consumer Goods &bull; FMCG</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-ITC">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">LT</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Larsen &amp; Toubro</div>
+            <div class="const-sec">Industrials &bull; Infrastructure</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-LT">10.00%</span>
+            </div>
+          </div>
+
+          <div class="constituent-card">
+            <div class="const-header">
+              <span class="badge-ticker">HINDUNILVR</span>
+              <span style="font-size: 11px; font-weight: 700; color: #059669;">NSE BLUE-CHIP</span>
+            </div>
+            <div class="const-name">Hindustan Unilever</div>
+            <div class="const-sec">Consumer Goods &bull; FMCG</div>
+            <div class="const-weight-bar">
+              <span style="color: #64748B;">Base: 10.00%</span>
+              <span style="color: #065F46; font-weight: 800;" id="card-wt-HINDUNILVR">10.00%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Rulebook & Constraints -->
+      <section class="landing-section" id="sec-rulebook">
+        <div class="section-head">
+          <div class="section-eyebrow">QUANTITATIVE SAFEGUARDS</div>
+          <h3 class="section-title">Strict Mathematical Bounds &amp; Regulatory Compliance</h3>
+          <p class="section-desc">
+            To prevent erratic whipsawing and maintain institutional risk standards, the optimizer enforces 4 mathematical safety rails at every cycle.
+          </p>
+        </div>
+
+        <div class="rules-grid">
+          <div class="rule-card">
+            <div class="rule-num">RULE 01</div>
+            <div class="rule-title">Exact Simplex Normalization</div>
+            <div class="rule-formula">&Sigma; w&#7522; = 100.00%</div>
+            <div class="rule-desc">
+              All constituent weights sum exactly to 1.0000. No leverage, cash drag, or unallocated reserves are permitted.
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-num">RULE 02</div>
+            <div class="rule-title">Constituent Box Bounds</div>
+            <div class="rule-formula">5.0% &le; w&#7522; &le; 20.0%</div>
+            <div class="rule-desc">
+              Hard 5% floor prevents complete liquidation of any stock. 20% ceiling prevents single-stock concentration blowups.
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-num">RULE 03</div>
+            <div class="rule-title">Single-Cycle Movement Cap</div>
+            <div class="rule-formula">|&Delta;w&#7522;| &le; &plusmn;2.00%</div>
+            <div class="rule-desc">
+              Dampens sudden sentiment volatility. No stock weight can move by more than 2 percentage points in a single cycle.
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-num">RULE 04</div>
+            <div class="rule-title">Turnover Cost Ceiling</div>
+            <div class="rule-formula">0.5 &times; &Sigma;|&Delta;w&#7522;| &le; 10.0%</div>
+            <div class="rule-desc">
+              Controls transaction slippage and broker execution costs. Rebalances are rejected or scaled if turnover exceeds 10%.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Gateway Banner -->
+      <div class="landing-cta-banner">
+        <div class="cta-text">
+          <h3>Ready to test the live tactical rebalancer?</h3>
+          <p>
+            Trigger curated stress scenarios (Banking Regulatory Fine, Tech AI Surge, Macro Capex) or ingest any live breaking headline to observe real-time simplex rebalancing.
+          </p>
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="switchView('terminal')" style="padding: 14px 28px; font-size: 16px;">
+          Enter Interactive Terminal &rarr;
+        </button>
+      </div>
+
+    </div>
+
+    <!-- =====================================================================
+         VIEW 2: DEDICATED LIVE REBALANCE TERMINAL WORKSPACE
+         ===================================================================== -->
+    <div id="view-terminal" class="view-panel">
+
+      <!-- Terminal Top Navigation Bar -->
+      <div class="terminal-topbar">
+        <div class="terminal-title-group">
+          <button class="btn-back-overview" onclick="switchView('landing')">
+            &larr; Back to Overview
+          </button>
+          <div class="terminal-view-title">
+            Tactical Stock Index Rebalancer &mdash; Live Interactive Terminal
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="pill-status" style="background: #082119; color: #34D399; border-color: #0F3A2E;">
+            <span class="dot-live"></span>
+            <span>PIPELINE: ACTIVE</span>
+          </div>
+          <div class="pill-status" style="background: #082119; color: #FFFFFF; border-color: #0F3A2E;">
+            <span>CYCLE: #<span id="terminal-cycle">0</span></span>
+          </div>
+          <div class="pill-status" style="background: #082119; color: #FFFFFF; border-color: #0F3A2E;">
+            <span>7-DAY MEMORY: <span id="terminal-memory">0</span> ITEMS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Metric Summary Row with Colored Top Borders -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-title">
+            Total Allocation
+            <span class="info-icon" data-tooltip="Sum of all 10 constituent weights. Strictly guaranteed to equal exactly 100.00% via water-filling bounded simplex projection across all market conditions." data-tooltip-title="Total Portfolio Allocation" data-tooltip-formula="Σ_{i=1}^{10} w_i = 100.00%">i</span>
+          </div>
+          <div class="kpi-value" id="metric-total">100.00%</div>
+          <div class="kpi-meta">Strictly normalized sum</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">
+            One-Way Turnover
+            <span class="info-icon" data-tooltip="Half of total absolute weight shift: 0.5 × Σ|w_new - w_old|. Strict institutional mandate caps this at 10.0% max per cycle to minimize market impact." data-tooltip-title="One-Way Turnover" data-tooltip-formula="Turnover = 0.5 × Σ |w_i - w_prev| ≤ 10.0%">i</span>
+          </div>
+          <div class="kpi-value" id="metric-turnover">0.00%</div>
+          <div class="kpi-meta">Institutional ceiling: 10.0%</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">
+            Max Cycle Delta
+            <span class="info-icon" data-tooltip="The largest individual constituent weight shift in this cycle. Bound by the ±2.0% per-cycle safety dampener." data-tooltip-title="Maximum Constituent Shift" data-tooltip-formula="|Δw_i| ≤ 2.00%">i</span>
+          </div>
+          <div class="kpi-value" id="metric-max-delta">&plusmn;0.00%</div>
+          <div class="kpi-meta">Step cap: &plusmn;2.00% per cycle</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">
+            Active Risk Signals
+            <span class="info-icon" data-tooltip="Number of sentiment signals currently influencing the portfolio weights in the active 7-day memory window." data-tooltip-title="Active Signal Volume">i</span>
+          </div>
+          <div class="kpi-value" id="metric-signals-count">0</div>
+          <div class="kpi-meta">Applied to current cycle</div>
+        </div>
+      </div>
+
+      <!-- Action Toolbar (Replay Controls & Custom Ingestion) -->
+      <div class="controls-panel">
+        <div class="scenario-group">
+          <span class="controls-label" data-tooltip="Pre-configured real-world stress and opportunity test cases to demonstrate dynamic index tilting." data-tooltip-title="Curated Test Scenarios">
+            Curated Replays <span class="info-icon">i</span>:
+          </span>
+          <button class="btn btn-scenario btn-scenario-a" onclick="triggerReplay('scenario_tech_surge')" data-tooltip="Simulates Q3 cloud mega-deal win for Infosys (+0.82) and enterprise generative AI rollout for TCS (+0.75). Observe upward tilt in tech constituents." data-tooltip-title="Scenario A: Tech AI Expansion">
+            A: Tech AI Surge (INFY / TCS)
+          </button>
+          <button class="btn btn-scenario btn-scenario-b" onclick="triggerReplay('scenario_banking_stress')" data-tooltip="Simulates RBI regulatory penalty and compliance audit on HDFC Bank (-0.85). Observe downward tilt safely dampened to -2.0% step limit." data-tooltip-title="Scenario B: Banking Regulatory Shock">
+            B: Regulatory Fine (HDFC Bank)
+          </button>
+          <button class="btn btn-scenario btn-scenario-c" onclick="triggerReplay('scenario_macro_mixed')" data-tooltip="Simulates ₹15,000 Cr domestic infrastructure contract for L&amp;T (+0.78), telecom AGR relief for Bharti Airtel (+0.65), and Reliance capex." data-tooltip-title="Scenario C: Macro Capex &amp; Relief">
+            C: Capex &amp; AGR (L&amp;T / RIL / Airtel)
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-primary" onclick="openCustomModal()" data-tooltip="Opens live form to input any breaking headline or tweet. Tests entity resolution, sentiment scoring, and index rebalancing." data-tooltip-title="Live Headline Ingestion">
+            + Ingest Custom Headline
+          </button>
+          <button class="btn btn-outline-danger" onclick="triggerReset()" data-tooltip="Restores all 10 constituent weights back to the neutral 10.00% equal-weight benchmark and clears shock memory." data-tooltip-title="Reset Portfolio">
+            Reset to 10% Benchmark
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Split Grid -->
+      <div class="dashboard-grid">
+
+        <!-- Left Column: Portfolio Allocation Matrix -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-heading">Nifty 10 Tactical Index Allocation Matrix</div>
+              <div class="card-description" id="last-rebalance-reason">Baseline: 10.0% Equal-weight benchmark across all constituents</div>
+            </div>
+            <div class="tag-limits" data-tooltip="Hard regulatory constraints: no constituent can fall below 5.0% or exceed 20.0%." data-tooltip-title="Portfolio Box Constraints" data-tooltip-formula="5.0% ≤ w_i ≤ 20.0%">
+              BOUNDS: [5.0% - 20.0%] <span class="info-icon">i</span>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>
+                    <span data-tooltip="NSE security symbol for each of the 10 representative blue-chip stocks." data-tooltip-title="Constituent Ticker">
+                      Ticker <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Corporate legal entity name and primary industry sector." data-tooltip-title="Company &amp; Sector">
+                      Company &amp; Sector <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Baseline neutral index allocation (10.00% equal weight per stock)." data-tooltip-title="Baseline Benchmark" data-tooltip-formula="w_base = 10.00%">
+                      Benchmark <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Active tactical weight after sentiment tilting, strictly bounded between 5% floor and 20% cap." data-tooltip-title="Tactical Current Weight" data-tooltip-formula="5.0% ≤ w_i ≤ 20.0%">
+                      Current Weight <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Change in weight vs previous cycle (Δw). Capped at ±2.0% per cycle to prevent excessive turnover." data-tooltip-title="Cycle Delta (Δw)" data-tooltip-formula="|Δw| ≤ 2.00%">
+                      Cycle Delta <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Credibility-weighted, time-decayed net sentiment score [-1.00 to +1.00] from ingested news and social signals." data-tooltip-title="Net Sentiment Score" data-tooltip-formula="S ∈ [-1.0, +1.0]">
+                      Sentiment <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                  <th>
+                    <span data-tooltip="Compliance verification confirming weight satisfies 5.0% ≤ w_i ≤ 20.0% and Σw_i = 100.0%." data-tooltip-title="Constraint Compliance">
+                      Bounds <span class="info-icon">i</span>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="portfolio-tbody">
+                <!-- Populated via Javascript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right Column: Live Risk Signal Stream with Shaded Container -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-heading">Real-Time Risk Signal Stream</div>
+              <div class="card-description">Extracted signals with evidence attribution</div>
+            </div>
+            <div class="tag-limits" id="signals-badge-count" data-tooltip="Total unstructured signals currently influencing the risk engine." data-tooltip-title="Signal Volume">
+              0 SIGNALS <span class="info-icon">i</span>
+            </div>
+          </div>
+
+          <div class="feed-container" id="signals-container">
+            <div class="empty-state">
+              No external signals ingested yet.<br>
+              Click one of the <strong>Curated Replays</strong> above or ingest a <strong>Custom Headline</strong>.
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Modal 1: Custom Article Ingestion -->
+  <div class="modal-overlay" id="modal-custom">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Ingest Custom Financial Headline / Stream Item</div>
+        <button class="modal-close" onclick="closeCustomModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 16px;">
+          Submit any live financial headline or social post. The NLP Risk Engine will resolve the company ticker,
+          score sentiment (-1.0 to +1.0), classify the event taxonomy, and rebalance the portfolio.
+        </p>
+
+        <form id="custom-form" onsubmit="submitCustomArticle(event)">
+          <div class="form-group">
+            <label class="form-label">Headline / Title *</label>
+            <input type="text" id="custom-title" class="form-input" placeholder="e.g. Infosys wins $800M cloud migration deal" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Text / Post Body *</label>
+            <textarea id="custom-text" class="form-textarea" rows="3" placeholder="Enter article summary or tweet text..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Source Stream</label>
+              <select id="custom-source" class="form-select">
+                <option value="news">News Feed (Credibility 0.8)</option>
+                <option value="announcement">Corporate Announcement (Credibility 1.0)</option>
+                <option value="social">Social Media (Credibility 0.3)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Ticker (Optional Override)</label>
+              <select id="custom-ticker" class="form-select">
+                <option value="">Auto-Detect via Entity Resolution</option>
+                <option value="RELIANCE">RELIANCE (Reliance Industries)</option>
+                <option value="TCS">TCS (Tata Consultancy Services)</option>
+                <option value="INFY">INFY (Infosys)</option>
+                <option value="HDFCBANK">HDFCBANK (HDFC Bank)</option>
+                <option value="ICICIBANK">ICICIBANK (ICICI Bank)</option>
+                <option value="SBIN">SBIN (State Bank of India)</option>
+                <option value="BHARTIARTL">BHARTIARTL (Bharti Airtel)</option>
+                <option value="ITC">ITC (ITC Ltd)</option>
+                <option value="LT">LT (Larsen &amp; Toubro)</option>
+                <option value="HINDUNILVR">HINDUNILVR (Hindustan Unilever)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+            <button type="button" class="btn btn-outline-danger" onclick="closeCustomModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Process &amp; Rebalance</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Methodology & Institutional Proof -->
+  <div class="modal-overlay" id="modal-methodology">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Quantitative Index Rebalancing Methodology (Module A)</div>
+        <button class="modal-close" onclick="closeMethodologyModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>1. Multi-Source Credibility Weighted Sentiment</h4>
+        <p>
+          Incoming signals are aggregated per constituent stock using source credibility coefficients:
+          Official Regulatory Announcements (1.0) &gt; Financial News Feeds (0.8) &gt; Social Chatter (0.3).
+          Social-only aggregate sentiment is constrained to &plusmn;0.3 to prevent irrational market noise amplification.
+        </p>
+
+        <h4>2. Exponential Tilting Allocation Formula</h4>
+        <p>
+          Target constituent weights are calculated proportionally via exponential tilting:
+          <br>
+          <code style="font-family: var(--font-mono); color: var(--emerald-700); display: block; margin: 10px 0; background: var(--emerald-badge-bg); padding: 10px; border-radius: 6px; border: 1px solid #A7F3D0;">
+            Target Weight w&#771;&#7522; &prop; 0.10 &times; exp(0.5 &times; S&#7522;)
+          </code>
+          where S&#7522; is the net sentiment score [&minus;1.0, +1.0]. Symmetric formulation guarantees non-negativity and market-wide neutrality.
+        </p>
+
+        <h4>3. Hard Institutional Constraints &amp; Water-Filling Simplex Projection</h4>
+        <ul>
+          <li><strong>Sum Constraint:</strong> &sum; w&#7522; = 1.0 (Strictly 100.00% total allocation).</li>
+          <li><strong>Constituent Bounds:</strong> 5.0% &le; w&#7522; &le; 20.0% (Diversification floor and single-stock concentration ceiling).</li>
+          <li><strong>Cycle Movement Limit:</strong> |w&#7522;&#7508;&#8315;&sup1;&#8318; &minus; w&#7522;&#7508;| &le; 2.0% (Smooth, non-erratic portfolio transitions).</li>
+          <li><strong>Turnover Constraint:</strong> 0.5 &times; &sum; |&Delta;w&#7522;| &le; 10.0% (Strict transaction cost control).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Privacy Policy -->
+  <div class="modal-overlay" id="modal-privacy">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Privacy Policy</div>
+        <button class="modal-close" onclick="closePrivacyModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Data Collection &amp; Processing</h4>
+        <p>
+          This application operates as an academic research and simulated technology demonstration for the
+          S&amp;P Global &amp; CRISIL Campus Hackathon 2026. The data ingested by this system consists exclusively
+          of public RSS headlines, publicly distributed news publications, and public social feeds.
+        </p>
+        <h4>Confidential Client Data</h4>
+        <p>
+          In accordance with Section 8 of the Hackathon Submission Guidelines, no proprietary, non-public, or
+          confidential client information from S&amp;P Global or CRISIL is collected, stored, or utilized in this codebase.
+        </p>
+        <h4>Local Rolling Retention</h4>
+        <p>
+          Ingested textual items and vector embeddings are stored in a rolling local 7-day memory cache. Records
+          older than 7 days are automatically purged to prevent unnecessary data persistence.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Terms & Conditions & Financial Disclaimer -->
+  <div class="modal-overlay" id="modal-terms">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Terms &amp; Conditions &bull; Research Disclaimer</div>
+        <button class="modal-close" onclick="closeTermsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Simulated Research Prototype</h4>
+        <p>
+          This software is developed strictly for evaluation purposes in the S&amp;P Global &amp; CRISIL Campus Hackathon 2026.
+          All index rebalancing calculations, sentiment scores, and portfolio allocations generated by this system
+          are mathematical simulations and do not constitute financial advice, investment recommendations, or an offer
+          to trade equities.
+        </p>
+        <h4>MIT License</h4>
+        <p>
+          Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+          documentation files to deal in the Software without restriction, including the rights to use, copy, modify,
+          merge, and publish, subject to the MIT License provisions contained in the repository.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Architecture Diagram Modal -->
+  <div class="modal-overlay" id="modal-architecture">
+    <div class="modal-card" style="max-width: 980px;">
+      <div class="modal-header">
+        <div class="modal-title">End-to-End System Architecture &amp; Data Flow (Module A)</div>
+        <button class="modal-close" onclick="closeArchitectureModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        
+        <!-- Crisp Vector Architecture Diagram (Zero Loading Lag, 100% Reliable) -->
+        <svg viewBox="0 0 920 480" width="100%" height="auto" style="border-radius: 8px; border: 1.5px solid var(--border-strong); background: #F8FAFC; box-shadow: var(--shadow-sm); display: block;" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background Grid Pattern -->
+          <defs>
+            <pattern id="archGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#E2E8F0" stroke-width="0.8"/>
+            </pattern>
+            <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#047857"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563EB"/>
+            </marker>
+          </defs>
+          <rect width="920" height="480" fill="url(#archGrid)" />
+
+          <!-- Diagram Header -->
+          <rect x="0" y="0" width="920" height="42" fill="#082119" />
+          <text x="24" y="26" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="800" fill="#FFFFFF">S&amp;P GLOBAL &amp; CRISIL CAMPUS HACKATHON 2026 &bull; MODULE A SYSTEM ARCHITECTURE</text>
+          <text x="896" y="26" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#34D399" text-anchor="end">REAL-TIME DATA FLOW</text>
+
+          <!-- LAYER 1: Multi-Source Ingestion -->
+          <g transform="translate(30, 65)">
+            <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+            <rect width="250" height="32" rx="8" fill="#EFF6FF"/>
+            <rect y="24" width="250" height="8" fill="#EFF6FF"/>
+            <line x1="0" y1="32" x2="250" y2="32" stroke="#BFDBFE" stroke-width="1"/>
+            <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#1E40AF">1. INGESTION LAYER</text>
+            
+            <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Economic Times Stock RSS (News)</text>
+            <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; NSE Corporate Filings (Announcements)</text>
+            <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Apify Reddit Stream (Social Sentiment)</text>
+            <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Source Weights: 1.0 / 0.8 / 0.3</text>
+            <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; SHA-256 Deduplication Fingerprint</text>
+            <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#2563EB">&bull; Output: RawTextItem</text>
+          </g>
+
+          <!-- LAYER 2: 7-Day Memory & RAG -->
+          <g transform="translate(30, 270)">
+            <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#059669" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+            <rect width="250" height="32" rx="8" fill="#ECFDF5"/>
+            <rect y="24" width="250" height="8" fill="#ECFDF5"/>
+            <line x1="0" y1="32" x2="250" y2="32" stroke="#A7F3D0" stroke-width="1"/>
+            <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#065F46">2. 7-DAY VECTOR MEMORY</text>
+            
+            <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Rolling 7-Day Storage Window</text>
+            <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; 384-Dim Vector Embeddings</text>
+            <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Cosine Similarity Search</text>
+            <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Decay: exp(-ln(2) &times; t / half_life)</text>
+            <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Automatic Retention Purge</text>
+            <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#059669">&bull; Context Injection for RAG</text>
+          </g>
+
+          <!-- Connectors 1 -> 2 and 1 -> 3 -->
+          <path d="M 155 240 L 155 264" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M 280 152 L 330 152" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+          <path d="M 280 340 L 330 200" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+
+          <!-- LAYER 3: AI/NLP Risk Engine -->
+          <g transform="translate(335, 65)">
+            <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+            <rect width="250" height="32" rx="8" fill="#FFFBEB"/>
+            <rect y="24" width="250" height="8" fill="#FFFBEB"/>
+            <line x1="0" y1="32" x2="250" y2="32" stroke="#FDE68A" stroke-width="1"/>
+            <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#92400E">3. AI/NLP RISK ENGINE</text>
+            
+            <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Nifty 10 Entity Resolution</text>
+            <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Sentiment Polarity [-1.0, +1.0]</text>
+            <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; 8 Financial Event Taxonomies</text>
+            <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Impact Severity Rubric (1-10)</text>
+            <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Dual Mode: Nemotron + Lexicon</text>
+            <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#D97706">&bull; Output: RiskSignal + Evidence IDs</text>
+          </g>
+
+          <!-- LAYER 4: Tactical Rebalancer (Module A) -->
+          <g transform="translate(335, 270)">
+            <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#047857" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+            <rect width="250" height="32" rx="8" fill="#D1FAE5"/>
+            <rect y="24" width="250" height="8" fill="#D1FAE5"/>
+            <line x1="0" y1="32" x2="250" y2="32" stroke="#A7F3D0" stroke-width="1"/>
+            <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#065F46">4. TACTICAL REBALANCER</text>
+            
+            <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Nifty 10 Basket (10% Benchmark)</text>
+            <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Tilt: w &prop; 0.10 &times; exp(0.5 &times; S)</text>
+            <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Bounds: [5.0% Min, 20.0% Max]</text>
+            <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Cycle Delta Cap: &plusmn;2.0% per stock</text>
+            <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Turnover Limit: 10% one-way max</text>
+            <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#047857">&bull; Water-Filling Simplex Projection</text>
+          </g>
+
+          <!-- Connector 3 -> 4 -->
+          <path d="M 460 240 L 460 264" fill="none" stroke="#047857" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <!-- Connectors to Delivery Layer -->
+          <path d="M 585 152 L 635 152" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M 585 358 L 635 358" fill="none" stroke="#047857" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <!-- LAYER 5: Web Terminal & FastAPI -->
+          <g transform="translate(640, 115)">
+            <rect width="250" height="250" rx="8" fill="#FFFFFF" stroke="#082119" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+            <rect width="250" height="32" rx="8" fill="#082119"/>
+            <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#FFFFFF">5. FINANCIAL WORKBENCH</text>
+            
+            <text x="16" y="58" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="700" fill="#0F172A">FastAPI REST Server (Port 8000)</text>
+            <text x="16" y="78" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; GET /api/portfolio (Latest weights)</text>
+            <text x="16" y="96" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; GET /api/signals (Extracted NLP)</text>
+            <text x="16" y="114" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; POST /api/replay (A, B, C scenarios)</text>
+            <text x="16" y="132" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; POST /api/analyze-custom (Live test)</text>
+
+            <line x1="12" y1="146" x2="238" y2="146" stroke="#E2E8F0" stroke-width="1"/>
+            
+            <text x="16" y="168" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="700" fill="#0F172A">Interactive Dashboard UI</text>
+            <text x="16" y="188" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; Real-Time Allocation Progress Bars</text>
+            <text x="16" y="206" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; Live News Signal Stream with Evidence</text>
+            <text x="16" y="224" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; 1-Click Curated Market Scenarios</text>
+            <text x="16" y="242" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#047857" font-weight="700">&bull; Single Command: python main.py</text>
+          </g>
+        </svg>
+
+        <p style="margin-top: 14px; font-size: 13.5px; color: var(--text-body); text-align: left; line-height: 1.6;">
+          <strong>End-to-End Execution Flow:</strong> Text items stream into the Ingestion Layer, are fingerprinted with SHA-256 to eliminate duplicates, and are registered in the 7-Day Vector Memory. The AI/NLP Risk Engine resolves mentions against the Nifty 10 universe and calculates multi-source sentiment scores. Finally, the Tactical Rebalancer applies exponential tilting and water-filling simplex projection to rebalance index constituent weights under strict 5%–20% institutional constraints.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Deep Forest Slate Anchor -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        &copy; 2026 S&amp;P Global &amp; CRISIL Campus Hackathon &bull; Phase 3 Case Study &bull; IGDTUW
+      </div>
+      <div class="footer-links">
+        <button onclick="openMethodologyModal()">Rebalancing Methodology</button>
+        <button onclick="openPrivacyModal()">Privacy Policy</button>
+        <button onclick="openTermsModal()">Terms of Service</button>
+        <a href="https://github.com" target="_blank" rel="noopener">Repository Source</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    let currentPortfolio = null;
+
+    async function initDashboard() {
+      // Check initial view route
+      if (window.location.hash === '#terminal') {
+        switchView('terminal');
+      } else {
+        switchView('landing');
+      }
+
+      await fetchHealth();
+      await fetchPortfolio();
+      await fetchSignals();
+
+      // Periodic live data sync
+      setInterval(async () => {
+        try {
+          await fetchHealth();
+          await fetchPortfolio();
+          await fetchSignals();
+        } catch (e) {}
+      }, 5000);
+    }
+
+    async function fetchHealth() {
+      try {
+        const res = await fetch('/health');
+        if (res.ok) {
+          const data = await res.json();
+          const headCycle = document.getElementById('header-cycle');
+          if (headCycle) headCycle.innerText = data.portfolio_cycle;
+          const termCyc = document.getElementById('terminal-cycle');
+          if (termCyc) termCyc.innerText = data.portfolio_cycle;
+          const headMem = document.getElementById('header-memory');
+          if (headMem) headMem.innerText = data.memory_records;
+          const termMem = document.getElementById('terminal-memory');
+          if (termMem) termMem.innerText = data.memory_records;
+        }
+      } catch (err) {
+        console.error("Health check error:", err);
+      }
+    }
+
+    async function fetchPortfolio() {
+      try {
+        const res = await fetch('/api/portfolio');
+        if (res.ok) {
+          currentPortfolio = await res.json();
+          renderPortfolio(currentPortfolio);
+        }
+      } catch (err) {
+        console.error("Failed to fetch portfolio:", err);
+      }
+    }
+
+    async function fetchSignals() {
+      try {
+        const res = await fetch('/api/signals?limit=25');
+        if (res.ok) {
+          const signals = await res.json();
+          renderSignals(signals);
+        }
+      } catch (err) {
+        console.error("Failed to fetch signals:", err);
+      }
+    }
+
+    function renderPortfolio(portfolio) {
+      const headCycle = document.getElementById('header-cycle');
+      if (headCycle) headCycle.innerText = portfolio.cycle_number;
+      const termCyc = document.getElementById('terminal-cycle');
+      if (termCyc) termCyc.innerText = portfolio.cycle_number;
+
+      document.getElementById('last-rebalance-reason').innerText = portfolio.rebalance_reason;
+      document.getElementById('metric-total').innerText = (portfolio.total_weight * 100).toFixed(2) + '%';
+      document.getElementById('metric-turnover').innerText = (portfolio.turnover * 100).toFixed(2) + '%';
+      document.getElementById('metric-signals-count').innerText = portfolio.active_signals_count;
+
+      const tbody = document.getElementById('portfolio-tbody');
+      tbody.innerHTML = '';
+
+      let maxDelta = 0;
+
+      const tickers = Object.keys(portfolio.allocations);
+      tickers.forEach(t => {
+        const item = portfolio.allocations[t];
+        const absDelta = Math.abs(item.delta_weight);
+        if (absDelta > maxDelta) maxDelta = absDelta;
+
+        // Synchronize Landing Page live ticker chips & cards
+        const chipEl = document.getElementById(`lt-wt-${t}`);
+        if (chipEl) chipEl.innerText = `${item.weight_pct.toFixed(2)}%`;
+        const cardEl = document.getElementById(`card-wt-${t}`);
+        if (cardEl) {
+          cardEl.innerText = `${item.weight_pct.toFixed(2)}%`;
+          cardEl.style.color = item.delta_weight > 0 ? '#059669' : (item.delta_weight < 0 ? '#DC2626' : '#065F46');
+        }
+
+        const tr = document.createElement('tr');
+
+        let deltaClass = 'badge-zero';
+        let deltaSign = '';
+        let deltaDesc = 'Neutral: 0.00% change vs prior cycle';
+        if (item.delta_weight > 0.0001) {
+          deltaClass = 'badge-pos';
+          deltaSign = '+';
+          deltaDesc = `Overweight tilt of +${(item.delta_weight * 100).toFixed(2)}% vs prior cycle`;
+        } else if (item.delta_weight < -0.0001) {
+          deltaClass = 'badge-neg';
+          deltaDesc = `Underweight tilt of ${(item.delta_weight * 100).toFixed(2)}% vs prior cycle`;
+        }
+
+        let barClass = '';
+        if (item.weight < 0.0999) barClass = 'tilted-down';
+
+        // Scale 0-20% max ceiling = 0-100% bar width
+        const barWidthPct = Math.min(100, Math.max(0, (item.weight / 0.20) * 100));
+
+        const sentDesc = item.sentiment_score > 0
+          ? `Bullish sentiment (+${item.sentiment_score.toFixed(2)}): tilting constituent overweight`
+          : (item.sentiment_score < 0
+              ? `Bearish sentiment (${item.sentiment_score.toFixed(2)}): tilting constituent underweight`
+              : `Neutral sentiment (0.00): benchmark baseline allocation`);
+
+        tr.innerHTML = `
+          <td>
+            <div class="badge-ticker" data-tooltip="${item.name} (${item.sector}) - Primary blue-chip constituent in Nifty 10 benchmark" data-tooltip-title="${item.ticker}">${item.ticker}</div>
+          </td>
+          <td>
+            <div class="comp-name" data-tooltip="${item.name} operating in the ${item.sector} sector" data-tooltip-title="Corporate Entity">${item.name}</div>
+            <div class="comp-sector">${item.sector}</div>
+          </td>
+          <td style="font-family: var(--font-mono); color: var(--text-dark); font-weight: 600;" data-tooltip="Neutral benchmark baseline: 10.00% equal allocation across all 10 stocks" data-tooltip-title="Baseline Weight" data-tooltip-formula="w_base = 10.00%">10.00%</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 14px;" data-tooltip="Active tactical weight: ${item.weight_pct.toFixed(2)}% | Floor: 5.00% | Cap: 20.00% | Vertical notch marks 10.0% benchmark" data-tooltip-title="${item.ticker} Allocation" data-tooltip-formula="5.0% ≤ ${item.weight_pct.toFixed(2)}% ≤ 20.0%">
+              <span class="weight-text">${item.weight_pct.toFixed(2)}%</span>
+              <div class="bar-track">
+                <div class="bar-fill ${barClass}" style="width: ${barWidthPct}%;"></div>
+                <div class="bar-notch"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge-delta ${deltaClass}" data-tooltip="${deltaDesc}. Strictly within ±2.0% cycle dampener." data-tooltip-title="Cycle Delta (Δw)" data-tooltip-formula="|Δw| ≤ 2.00%">
+              ${deltaSign}${(item.delta_weight * 100).toFixed(2)}%
+            </span>
+          </td>
+          <td style="font-family: var(--font-mono); font-weight: 800; color: ${item.sentiment_score > 0 ? '#047857' : (item.sentiment_score < 0 ? '#DC2626' : '#475569')}" data-tooltip="${sentDesc}" data-tooltip-title="Sentiment Polarity (S)" data-tooltip-formula="S = ${item.sentiment_score.toFixed(2)} ∈ [-1.0, +1.0]">
+            ${item.sentiment_score > 0 ? '+' : ''}${item.sentiment_score.toFixed(2)}
+          </td>
+          <td>
+            <span style="font-family: var(--font-mono); font-size: 12px; color: #065F46; font-weight: 800; background: #D1FAE5; padding: 4px 9px; border-radius: 4px; border: 1px solid #A7F3D0; cursor: help;" data-tooltip="Portfolio weight satisfies 5.0% minimum floor, 20.0% maximum concentration ceiling, and sum equals 100.00%." data-tooltip-title="Compliance Verified" data-tooltip-formula="0.05 ≤ w_i ≤ 0.20">
+              COMPLIANT
+            </span>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('metric-max-delta').innerText = (maxDelta > 0 ? '±' : '') + (maxDelta * 100).toFixed(2) + '%';
+    }
+
+    function renderSignals(signals) {
+      const container = document.getElementById('signals-container');
+      document.getElementById('signals-badge-count').innerText = `${signals.length} SIGNALS`;
+
+      if (!signals || signals.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            No external signals ingested yet.<br>
+            Click one of the <strong>Curated Replays</strong> above or ingest a <strong>Custom Headline</strong>.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      signals.forEach((sig, idx) => {
+        const item = document.createElement('div');
+        let cardClass = 'signal-item';
+        let sourceClass = 'src-news';
+        let srcLabel = 'Financial News Publication';
+        let srcWeight = 'Credibility 0.8 / 1.0 (High Reliability)';
+
+        if (sig.source === 'announcement') {
+          cardClass += ' item-announcement';
+          sourceClass = 'src-announcement';
+          srcLabel = 'Official Regulatory Filing';
+          srcWeight = 'Credibility 1.0 / 1.0 (Highest Authority)';
+        } else if (sig.source === 'social') {
+          cardClass += ' item-social';
+          sourceClass = 'src-social';
+          srcLabel = 'Social Chatter / Community Sentiment';
+          srcWeight = 'Credibility 0.3 / 1.0 (Clamped to ±0.3 to prevent noise)';
+        }
+
+        item.className = cardClass;
+
+        const sentColor = sig.sentiment_score > 0 ? '#047857' : (sig.sentiment_score < 0 ? '#DC2626' : '#475569');
+        const sentSign = sig.sentiment_score > 0 ? '+' : '';
+        const impactLabel = sig.impact_score >= 7 ? 'High market impact' : (sig.impact_score >= 4 ? 'Moderate market impact' : 'Minor market event');
+
+        item.innerHTML = `
+          <div class="item-header">
+            <div class="item-tags">
+              <span class="badge-ticker" data-tooltip="Resolved company entity: ${sig.ticker}" data-tooltip-title="Entity Identification">${sig.ticker}</span>
+              <span class="tag-src ${sourceClass}" data-tooltip="${srcLabel} (${srcWeight})" data-tooltip-title="Source Credibility">${sig.source}</span>
+              <span class="tag-event" data-tooltip="Event taxonomy: ${sig.event_classification.replace(/_/g, ' ').toUpperCase()}" data-tooltip-title="8-Class Event Taxonomy">${sig.event_classification}</span>
+            </div>
+            <div class="item-metrics">
+              <span style="color: ${sentColor}; cursor: help;" data-tooltip="Decayed NLP polarity score: ${sentSign}${sig.sentiment_score.toFixed(2)} [-1.00 to +1.00]" data-tooltip-title="Signal Polarity">Sent: ${sentSign}${sig.sentiment_score.toFixed(2)}</span>
+              <span class="chip-impact" data-tooltip="Institutional severity rubric: ${sig.impact_score}/10 (${impactLabel})" data-tooltip-title="Severity Rubric">Impact: ${sig.impact_score}/10</span>
+              <span style="color: #475569; font-size: 12px; cursor: help;" data-tooltip="Model entity extraction and taxonomy classification confidence" data-tooltip-title="Model Confidence">Conf: ${(sig.confidence * 100).toFixed(0)}%</span>
+            </div>
+          </div>
+          <div class="item-reason" data-tooltip="Financial causality rationale extracted by the NLP Risk Engine" data-tooltip-title="Signal Rationale">${sig.reason}</div>
+          <button class="btn-evidence" onclick="toggleEvidence('ev-${idx}')" data-tooltip="Click to toggle full audit provenance including Signal ID, model version, evidence references, and timestamp." data-tooltip-title="Provenance Audit">Inspect Evidence Reference</button>
+          <div class="box-evidence" id="ev-${idx}">
+            <strong>Signal ID:</strong> ${sig.id} &bull; <strong>Model:</strong> ${sig.model_version}<br>
+            <strong>Evidence IDs:</strong> ${sig.evidence_ids.join(', ') || 'N/A'}<br>
+            <strong>Timestamp:</strong> ${sig.timestamp}
+          </div>
+        `;
+
+        container.appendChild(item);
+      });
+    }
+
+    function toggleEvidence(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+
+    async function triggerReplay(scenarioId) {
+      try {
+        const res = await fetch(`/api/replay/${scenarioId}`, { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json();
+          await fetchHealth();
+          await fetchPortfolio();
+          await fetchSignals();
+        } else {
+          const err = await res.json();
+          alert('Replay Error: ' + (err.detail || 'Failed to execute scenario'));
+        }
+      } catch (err) {
+        console.error('Replay failed:', err);
+      }
+    }
+
+    async function triggerReset() {
+      try {
+        const res = await fetch('/api/reset', { method: 'POST' });
+        if (res.ok) {
+          await fetchHealth();
+          await fetchPortfolio();
+          await fetchSignals();
+        } else {
+          const err = await res.json();
+          alert('Reset Error');
+        }
+      } catch (err) {
+        console.error('Reset failed:', err);
+      }
+    }
+
+    function openCustomModal() {
+      document.getElementById('modal-custom').style.display = 'flex';
+    }
+    function closeCustomModal() {
+      document.getElementById('modal-custom').style.display = 'none';
+    }
+
+    async function submitCustomArticle(e) {
+      e.preventDefault();
+      const title = document.getElementById('custom-title').value;
+      const text = document.getElementById('custom-text').value;
+      const source = document.getElementById('custom-source').value;
+      const tickerVal = document.getElementById('custom-ticker').value;
+
+      const payload = {
+        title: title,
+        text: text,
+        source: source,
+        target_ticker: tickerVal ? tickerVal : null
+      };
+
+      try {
+        const res = await fetch('/api/analyze-custom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          if (!result.success) {
+            alert('Entity Resolution Warning: ' + result.message);
+          } else {
+            closeCustomModal();
+            document.getElementById('custom-form').reset();
+            await fetchHealth();
+            await fetchPortfolio();
+            await fetchSignals();
+          }
+        }
+      } catch (err) {
+        console.error('Custom submit failed:', err);
+      }
+    }
+
+    function openMethodologyModal() {
+      document.getElementById('modal-methodology').style.display = 'flex';
+    }
+    function closeMethodologyModal() {
+      document.getElementById('modal-methodology').style.display = 'none';
+    }
+
+    function openPrivacyModal() {
+      document.getElementById('modal-privacy').style.display = 'flex';
+    }
+    function closePrivacyModal() {
+      document.getElementById('modal-privacy').style.display = 'none';
+    }
+
+    function openTermsModal() {
+      document.getElementById('modal-terms').style.display = 'flex';
+    }
+    function closeTermsModal() {
+      document.getElementById('modal-terms').style.display = 'none';
+    }
+
+    function openArchitectureModal() {
+      document.getElementById('modal-architecture').style.display = 'flex';
+    }
+    function closeArchitectureModal() {
+      document.getElementById('modal-architecture').style.display = 'none';
+    }
+
+    function scrollToTerminal() {
+      const el = document.getElementById('terminal-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // ==========================================
+    // Institutional Floating Tooltip Engine
+    // ==========================================
+    const tooltipEl = document.getElementById('global-tooltip');
+    const ttHeader = document.getElementById('tt-header');
+    const ttBody = document.getElementById('tt-body');
+    const ttFormula = document.getElementById('tt-formula');
+    let activeTooltipTarget = null;
+
+    document.addEventListener('mouseover', (e) => {
+      const target = e.target.closest('[data-tooltip]');
+      if (!target || !tooltipEl) return;
+      activeTooltipTarget = target;
+      const text = target.getAttribute('data-tooltip');
+      const title = target.getAttribute('data-tooltip-title');
+      const formula = target.getAttribute('data-tooltip-formula');
+
+      if (!text && !title) return;
+
+      if (title) {
+        ttHeader.innerText = title;
+        ttHeader.style.display = 'flex';
+      } else {
+        ttHeader.style.display = 'none';
+      }
+
+      ttBody.innerText = text || '';
+
+      if (formula) {
+        ttFormula.innerText = formula;
+        ttFormula.style.display = 'block';
+      } else {
+        ttFormula.style.display = 'none';
+      }
+
+      positionTooltip(target);
+      tooltipEl.classList.add('visible');
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const target = e.target.closest('[data-tooltip]');
+      if (target && target === activeTooltipTarget && tooltipEl) {
+        tooltipEl.classList.remove('visible');
+        activeTooltipTarget = null;
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (activeTooltipTarget && tooltipEl && tooltipEl.classList.contains('visible')) {
+        positionTooltip(activeTooltipTarget);
+      }
+    }, { passive: true });
+
+    function positionTooltip(target) {
+      if (!tooltipEl) return;
+      const rect = target.getBoundingClientRect();
+      const padding = 12;
+
+      // Position above element by default
+      let top = rect.top - tooltipEl.offsetHeight - 8;
+      let left = rect.left + (rect.width / 2) - (tooltipEl.offsetWidth / 2);
+
+      // If too close to viewport top, flip below
+      if (top < 10) {
+        top = rect.bottom + 8;
+      }
+
+      // Viewport horizontal boundaries
+      if (left < padding) left = padding;
+      if (left + tooltipEl.offsetWidth > window.innerWidth - padding) {
+        left = window.innerWidth - tooltipEl.offsetWidth - padding;
+      }
+
+      tooltipEl.style.top = `${Math.round(top)}px`;
+      tooltipEl.style.left = `${Math.round(left)}px`;
+    }
+
+    // ==========================================
+    // View Switcher & Navigation System
+    // ==========================================
+    function switchView(viewName) {
+      const viewLanding = document.getElementById('view-landing');
+      const viewTerminal = document.getElementById('view-terminal');
+      const navBtnLanding = document.getElementById('nav-btn-landing');
+      const navBtnTerminal = document.getElementById('nav-btn-terminal');
+
+      if (!viewLanding || !viewTerminal) return;
+
+      if (viewName === 'terminal') {
+        viewLanding.classList.remove('active');
+        viewTerminal.classList.add('active');
+        if (navBtnLanding) navBtnLanding.classList.remove('active');
+        if (navBtnTerminal) navBtnTerminal.style.background = '#047857';
+        window.location.hash = 'terminal';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        viewTerminal.classList.remove('active');
+        viewLanding.classList.add('active');
+        if (navBtnLanding) navBtnLanding.classList.add('active');
+        if (navBtnTerminal) navBtnTerminal.style.background = '#059669';
+        window.location.hash = 'overview';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function scrollToLandingSection(secId) {
+      const viewLanding = document.getElementById('view-landing');
+      if (!viewLanding.classList.contains('active')) {
+        switchView('landing');
+        setTimeout(() => {
+          const el = document.getElementById(secId);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      } else {
+        const el = document.getElementById(secId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal-overlay')) {
+        event.target.style.display = 'none';
+      }
+    };
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+      }
+    });
+
+    window.onload = initDashboard;
+  </script>
+</body>
+</html>

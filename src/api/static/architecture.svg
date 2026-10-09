@@ -1,0 +1,117 @@
+<svg viewBox="0 0 920 480" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="archGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#E2E8F0" stroke-width="0.8"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#047857"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+  <rect width="920" height="480" fill="#F8FAFC" />
+  <rect width="920" height="480" fill="url(#archGrid)" />
+
+  <!-- Diagram Header -->
+  <rect x="0" y="0" width="920" height="42" fill="#082119" />
+  <text x="24" y="26" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="800" fill="#FFFFFF">S&amp;P GLOBAL &amp; CRISIL CAMPUS HACKATHON 2026 &bull; MODULE A SYSTEM ARCHITECTURE</text>
+  <text x="896" y="26" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#34D399" text-anchor="end">REAL-TIME DATA FLOW</text>
+
+  <!-- LAYER 1: Multi-Source Ingestion -->
+  <g transform="translate(30, 65)">
+    <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+    <rect width="250" height="32" rx="8" fill="#EFF6FF"/>
+    <rect y="24" width="250" height="8" fill="#EFF6FF"/>
+    <line x1="0" y1="32" x2="250" y2="32" stroke="#BFDBFE" stroke-width="1"/>
+    <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#1E40AF">1. INGESTION LAYER</text>
+    
+    <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Economic Times Stock RSS (News)</text>
+    <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; NSE Corporate Filings (Announcements)</text>
+    <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Apify Reddit Stream (Social Sentiment)</text>
+    <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Source Weights: 1.0 / 0.8 / 0.3</text>
+    <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; SHA-256 Deduplication Fingerprint</text>
+    <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#2563EB">&bull; Output: RawTextItem</text>
+  </g>
+
+  <!-- LAYER 2: 7-Day Memory & RAG -->
+  <g transform="translate(30, 270)">
+    <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#059669" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+    <rect width="250" height="32" rx="8" fill="#ECFDF5"/>
+    <rect y="24" width="250" height="8" fill="#ECFDF5"/>
+    <line x1="0" y1="32" x2="250" y2="32" stroke="#A7F3D0" stroke-width="1"/>
+    <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#065F46">2. 7-DAY VECTOR MEMORY</text>
+    
+    <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Rolling 7-Day Storage Window</text>
+    <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; 384-Dim Vector Embeddings</text>
+    <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Cosine Similarity Search</text>
+    <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Decay: exp(-ln(2) &times; t / half_life)</text>
+    <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Automatic Retention Purge</text>
+    <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#059669">&bull; Context Injection for RAG</text>
+  </g>
+
+  <!-- Connectors 1 -> 2 and 1 -> 3 -->
+  <path d="M 155 240 L 155 264" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 280 152 L 330 152" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M 280 340 L 330 200" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 3: AI/NLP Risk Engine -->
+  <g transform="translate(335, 65)">
+    <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+    <rect width="250" height="32" rx="8" fill="#FFFBEB"/>
+    <rect y="24" width="250" height="8" fill="#FFFBEB"/>
+    <line x1="0" y1="32" x2="250" y2="32" stroke="#FDE68A" stroke-width="1"/>
+    <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#92400E">3. AI/NLP RISK ENGINE</text>
+    
+    <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Nifty 10 Entity Resolution</text>
+    <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Sentiment Polarity [-1.0, +1.0]</text>
+    <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; 8 Financial Event Taxonomies</text>
+    <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Impact Severity Rubric (1-10)</text>
+    <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Dual Mode: Nemotron + Lexicon</text>
+    <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#D97706">&bull; Output: RiskSignal + Evidence IDs</text>
+  </g>
+
+  <!-- LAYER 4: Tactical Rebalancer (Module A) -->
+  <g transform="translate(335, 270)">
+    <rect width="250" height="175" rx="8" fill="#FFFFFF" stroke="#047857" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+    <rect width="250" height="32" rx="8" fill="#D1FAE5"/>
+    <rect y="24" width="250" height="8" fill="#D1FAE5"/>
+    <line x1="0" y1="32" x2="250" y2="32" stroke="#A7F3D0" stroke-width="1"/>
+    <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#065F46">4. TACTICAL REBALANCER</text>
+    
+    <text x="16" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Nifty 10 Basket (10% Benchmark)</text>
+    <text x="16" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Tilt: w &prop; 0.10 &times; exp(0.5 &times; S)</text>
+    <text x="16" y="100" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#0F172A">&bull; Bounds: [5.0% Min, 20.0% Max]</text>
+    <text x="16" y="122" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Cycle Delta Cap: &plusmn;2.0% per stock</text>
+    <text x="16" y="142" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748B">&bull; Turnover Limit: 10% one-way max</text>
+    <text x="16" y="162" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="700" fill="#047857">&bull; Water-Filling Simplex Projection</text>
+  </g>
+
+  <!-- Connector 3 -> 4 -->
+  <path d="M 460 240 L 460 264" fill="none" stroke="#047857" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Connectors to Delivery Layer -->
+  <path d="M 585 152 L 635 152" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 585 358 L 635 358" fill="none" stroke="#047857" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- LAYER 5: Web Terminal & FastAPI -->
+  <g transform="translate(640, 115)">
+    <rect width="250" height="250" rx="8" fill="#FFFFFF" stroke="#082119" stroke-width="2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+    <rect width="250" height="32" rx="8" fill="#082119"/>
+    <text x="14" y="21" font-family="'Plus Jakarta Sans', sans-serif" font-size="12.5" font-weight="800" fill="#FFFFFF">5. FINANCIAL WORKBENCH</text>
+    
+    <text x="16" y="58" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="700" fill="#0F172A">FastAPI REST Server (Port 8000)</text>
+    <text x="16" y="78" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; GET /api/portfolio (Latest weights)</text>
+    <text x="16" y="96" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; GET /api/signals (Extracted NLP)</text>
+    <text x="16" y="114" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; POST /api/replay (A, B, C scenarios)</text>
+    <text x="16" y="132" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#475569">&bull; POST /api/analyze-custom (Live test)</text>
+
+    <line x1="12" y1="146" x2="238" y2="146" stroke="#E2E8F0" stroke-width="1"/>
+    
+    <text x="16" y="168" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="700" fill="#0F172A">Interactive Dashboard UI</text>
+    <text x="16" y="188" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; Real-Time Allocation Progress Bars</text>
+    <text x="16" y="206" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; Live News Signal Stream with Evidence</text>
+    <text x="16" y="224" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">&bull; 1-Click Curated Market Scenarios</text>
+    <text x="16" y="242" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#047857" font-weight="700">&bull; Single Command: python main.py</text>
+  </g>
+</svg>
