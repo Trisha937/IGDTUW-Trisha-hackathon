@@ -1,10 +1,10 @@
 # Real-Time AI Financial Risk Engine & Tactical Stock Index Rebalancer - S&P Global & Crisil Campus Hackathon
 
 **Candidate Name:** Trisha  
-**College Email ID:** trisha@igdtuw.ac.in  
+**College Email ID:** trisha144btit24@igdtuw.ac.in  
 **College / Campus:** Indira Gandhi Delhi Technical University for Women (IGDTUW)  
 **Demo Video Link:** [YouTube / Unlisted - Video Link](https://youtu.be/placeholder-demo-link)  
-**Slide Deck Link (if hosted externally):** [View Presentation Deck (PDF)](docs/presentation.pdf)  
+**Slide Deck :** [View Presentation Deck (PDF)](docs/presentation.pdf)  
 
 ---
 
