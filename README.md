@@ -4,7 +4,7 @@
 **College Email ID:** trisha144btit24@igdtuw.ac.in  
 **College / Campus:** Indira Gandhi Delhi Technical University for Women (IGDTUW)  
 **Demo Video Link:** [YouTube / Unlisted - Video Link](https://youtu.be/_TjiyEMXxTQ)  
-**Slide Deck :** [View Presentation Deck (PDF)](docs/presentation.pdf)  
+**Slide Deck :** [View Presentation Deck (PDF)](docs/presentation.pdf) | [PowerPoint Deck (PPTX)](docs/presentation.pptx)  
 
 ---
 
@@ -67,7 +67,7 @@ The end-to-end processing pipeline operates in 5 modular stages:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Trisha-hackathon/IGDTUW-Trisha-hackathon.git
+git clone https://github.com/Trisha937/IGDTUW-Trisha-hackathon.git
 cd IGDTUW-Trisha-hackathon
 
 # 2. Install dependencies

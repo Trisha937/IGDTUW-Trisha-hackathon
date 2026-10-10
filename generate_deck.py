@@ -318,104 +318,21 @@ def build_slide_3(pdf):
     draw_slide_title(ax, "System Design & Processing Pipeline",
                      "How raw news flows through analysis and optimization to the live terminal")
 
-    # 5 Horizontal Pipeline Stages (Exactly matching our code)
-    stages = [
-        ("1. INGESTION", "Feed Collection", ROYAL_BLUE, [
-            "• ET Financial RSS",
-            "• NSE Announcements",
-            "• Reddit Chatter",
-            "• Weights: 1.0 / 0.8 / 0.3",
-            "• SHA-256 Deduplication"
-        ]),
-        ("2. 7-DAY MEMORY", "Recency Decay", DARK_EMERALD, [
-            "• Stores recent events",
-            "• 48h half-life decay",
-            "• exp(-λ·Δt) weighting",
-            "• Vector similarity match",
-            "• 7-day automatic purge"
-        ]),
-        ("3. RISK ENGINE", "NLP & Severity", AMBER, [
-            "• Nifty 10 entity matcher",
-            "• Sentiment: [-1.0, +1.0]",
-            "• 8 event categories",
-            "• Severity score: 1 to 10",
-            "• AI + Lexicon fallback"
-        ]),
-        ("4. REBALANCER", "Weight Tilting", EMERALD, [
-            "• Equal benchmark: 10%",
-            "• Tilts via sentiment",
-            "• Floor 5%, Cap 20%",
-            "• Max step: ±2.0%",
-            "• Max turnover: 10%"
-        ]),
-        ("5. TERMINAL UI", "Dashboard & Audit", INDIGO, [
-            "• FastAPI web server",
-            "• Executive landing page",
-            "• Live terminal matrix",
-            "• Audit drawer with text",
-            "• Replay scenarios (A, B, C)"
-        ])
-    ]
-
-    card_w = 0.165
-    card_h = 0.48
-    start_x = 0.04
-    spacing = 0.023
-    y_pos = 0.34
-
-    for i, (title, sub, color, items) in enumerate(stages):
-        x = start_x + i * (card_w + spacing)
-        draw_card(ax, x, y_pos, card_w, card_h, title=title,
-                  border_color=color, bg_color=CARD_BG, header_bg=color, corner_radius=0.012)
-
-        # Subtitle
-        ax.text(x + 0.01, y_pos + card_h - 0.075, sub, color=NAVY_TEXT, fontsize=9.2, fontweight="bold")
-        ax.plot([x + 0.01, x + card_w - 0.01], [y_pos + card_h - 0.088, y_pos + card_h - 0.088],
-                color=BORDER_COLOR, lw=0.8)
-
-        # Items
-        item_y = y_pos + card_h - 0.115
-        for item in items:
-            ax.text(x + 0.008, item_y, item, color=MUTED_TEXT, fontsize=8.6, va="center")
-            item_y -= 0.042
-
-        # Connecting arrow to next stage
-        if i < 4:
-            arrow_x = x + card_w + 0.003
-            arrow_y = y_pos + card_h / 2
-            ax.annotate("", xy=(arrow_x + 0.016, arrow_y), xytext=(arrow_x, arrow_y),
-                        arrowprops=dict(arrowstyle="->", color=ROYAL_BLUE, lw=2.0))
-
-    # Architecture Reliability Callouts
-    draw_card(ax, 0.04, 0.08, 0.92, 0.22, border_color=BORDER_COLOR, bg_color=CARD_BG)
-    ax.text(0.06, 0.265, "KEY RELIABILITY FEATURES (HOW WE MADE THE SYSTEM ROBUST)", color=CRISIL_RED,
-            fontsize=10.5, fontweight="bold")
-
-    cols = [
-        ("Dual-Engine Architecture", [
-            "• Primary analysis via NVIDIA Nemotron AI",
-            "• Instant local financial lexicon fallback",
-            "• Works seamlessly even without internet access"
-        ]),
-        ("Source Credibility Filter", [
-            "• Official company filings receive highest weight (1.0)",
-            "• Trusted financial news receives 0.8 weight",
-            "• Social chatter discounted by 70% (0.3) to prevent rumors"
-        ]),
-        ("Full Explainability & Audit", [
-            "• Every weight change points to the underlying headline",
-            "• Visible in the terminal's audit drawer with timestamp",
-            "• Clear why a stock was tilted up or down"
-        ])
-    ]
-
-    for j, (header, bullets) in enumerate(cols):
-        col_x = 0.06 + j * 0.31
-        ax.text(col_x, 0.23, f"✔  {header}", color=NAVY_TEXT, fontsize=10, fontweight="bold")
-        b_y = 0.20
-        for b in bullets:
-            ax.text(col_x, b_y, b, color=MUTED_TEXT, fontsize=8.3, va="center")
-            b_y -= 0.030
+    # Load and embed the high-resolution architecture flow diagram
+    arch_img_path = Path("docs/architecture.png")
+    if arch_img_path.exists():
+        import PIL.Image
+        img = PIL.Image.open(arch_img_path)
+        w, h = img.size
+        # Crop top title from standalone diagram so slide title stands out cleanly
+        img_crop = img.crop((0, int(h * 0.11), w, h))
+        ax.imshow(img_crop, extent=[0.04, 0.96, 0.075, 0.845], aspect="auto", zorder=2)
+    else:
+        # Fallback card if image not found
+        draw_card(ax, 0.04, 0.15, 0.92, 0.65, title="System Architecture Diagram",
+                  border_color=BORDER_COLOR, bg_color=CARD_BG)
+        ax.text(0.50, 0.50, "Architecture diagram: docs/architecture.png",
+                color=MUTED_TEXT, fontsize=12, ha="center")
 
     pdf.savefig(fig)
     plt.close(fig)
@@ -889,6 +806,27 @@ def generate_all_slides():
         print("Rendered PNG previews of all 7 slides.")
     except Exception as e:
         print("Note: fitz rendering skipped:", e)
+
+    # Also build PowerPoint (.pptx) presentation
+    try:
+        from pptx import Presentation
+        from pptx.util import Inches
+        prs = Presentation()
+        prs.slide_width = Inches(13.333)
+        prs.slide_height = Inches(7.5)
+        blank_layout = prs.slide_layouts[6]
+
+        for i in range(1, 8):
+            img_p = out_dir / f"slide_{i}.png"
+            if img_p.exists():
+                slide = prs.slides.add_slide(blank_layout)
+                slide.shapes.add_picture(str(img_p), 0, 0, width=prs.slide_width, height=prs.slide_height)
+
+        pptx_path = out_dir / "presentation.pptx"
+        prs.save(str(pptx_path))
+        print(f"PowerPoint deck successfully compiled: {pptx_path}")
+    except Exception as e:
+        print("Note: pptx generation skipped:", e)
 
 
 if __name__ == "__main__":
