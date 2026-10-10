@@ -3,7 +3,7 @@
 **Candidate Name:** Trisha  
 **College Email ID:** trisha144btit24@igdtuw.ac.in  
 **College / Campus:** Indira Gandhi Delhi Technical University for Women (IGDTUW)  
-**Demo Video Link:** [YouTube / Unlisted - Video Link](https://youtu.be/placeholder-demo-link)  
+**Demo Video Link:** [YouTube / Unlisted - Video Link](https://youtu.be/_TjiyEMXxTQ)  
 **Slide Deck :** [View Presentation Deck (PDF)](docs/presentation.pdf)  
 
 ---

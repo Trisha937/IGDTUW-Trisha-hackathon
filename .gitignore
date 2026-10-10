@@ -30,3 +30,7 @@ Thumbs.db
 
 # ---- Logs ----
 *.log
+
+# ---- Deck Generation & Previews ----
+generate_deck.py
+docs/slide_*.png
